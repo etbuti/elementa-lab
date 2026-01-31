@@ -55,10 +55,19 @@
           <div class="small">
             先留接口位：下一步我们会用 Cloudflare Worker 做 <code>/api/explain</code>，Key 存在服务端 secret。
           </div>
-          <div class="row" style="margin-top:10px;">
-            <button id="aiExplain" class="secondary" disabled>生成 AI 解释（下一步上线）</button>
-          </div>
-          <div id="aiOut" class="aiOut"></div>
+
+<div class="row" style="margin-top:10px;">
+  <input id="openaiKey" type="password" placeholder="输入 OpenAI API Key（仅本地使用，不上传 GitHub）" />
+</div>
+<div class="row" style="margin-top:10px;">
+  <button id="aiExplain" class="secondary">生成 AI 解释</button>
+</div>
+<div class="small" style="margin-top:8px;">
+  提醒：此模式会在浏览器端直接调用 OpenAI。仅建议你本人使用/内测，不建议公开给大众。
+</div>
+<div id="aiOut" class="aiOut"></div>
+
+          
         </div>
       </section>
 
