@@ -1,1 +1,75 @@
-。。
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Elementa Lab</title>
+  <link rel="stylesheet" href="./style.css" />
+  <!-- SmilesDrawer (draw 2D) -->
+  <script src="https://cdn.jsdelivr.net/npm/smiles-drawer@2.1.8/dist/smiles-drawer.min.js"></script>
+  <!-- OpenChemLib (basic chemistry props) -->
+  <script src="https://cdn.jsdelivr.net/npm/openchemlib@7.4.1/dist/openchemlib-full.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <h1>🧪 Elementa Lab</h1>
+        <p class="sub">SMILES → 结构图 → 基本性质 →（可选）AI 解释</p>
+      </div>
+      <div class="meta">
+        <div>Founder: <strong>Xiaojun Yin</strong></div>
+        <div>Guarantor: <strong>Goldisle Light Org Ltd (UK)</strong></div>
+      </div>
+    </header>
+
+    <main class="card">
+      <section class="controls">
+        <label for="smiles">SMILES</label>
+        <div class="row">
+          <input id="smiles" placeholder="例如：CCO / 阿司匹林：CC(=O)OC1=CC=CC=C1C(=O)O" />
+          <button id="analyze">分析</button>
+          <button id="demo">填入示例</button>
+        </div>
+        <div class="hint">
+          提示：这是纯静态网页（GitHub Pages）。化学计算在浏览器本地完成，无需服务器。
+        </div>
+      </section>
+
+      <section class="grid">
+        <div class="panel">
+          <h2>🧬 分子结构图</h2>
+          <div class="canvasWrap">
+            <svg id="molSvg" width="420" height="420"></svg>
+          </div>
+          <div class="small">
+            使用 SmilesDrawer 渲染 2D 结构（不依赖 Python/RDKit 服务端）。
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>📊 基本性质</h2>
+          <div id="props" class="props"></div>
+
+          <h2 style="margin-top:18px;">🧠 AI 文本解释</h2>
+          <div class="small">
+            先留接口位：下一步我们会用 Cloudflare Worker 做 <code>/api/explain</code>，Key 存在服务端 secret。
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button id="aiExplain" class="secondary" disabled>生成 AI 解释（下一步上线）</button>
+          </div>
+          <div id="aiOut" class="aiOut"></div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span>Elementa Lab · Git-driven web app</span>
+        <span class="sep">·</span>
+        <a href="https://github.com/etbuti/elementa-lab" target="_blank" rel="noreferrer">GitHub Repo</a>
+      </footer>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
