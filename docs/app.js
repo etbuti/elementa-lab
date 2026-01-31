@@ -7,6 +7,7 @@ const elSvg = $("molSvg");
 const elProps = $("props");
 const elAi = $("aiExplain");
 const elAiOut = $("aiOut");
+const elKey = $("openaiKey");
 
 function setProps(obj) {
   elProps.innerHTML = "";
@@ -100,7 +101,62 @@ elSmiles.addEventListener("keydown", (e) => {
   if (e.key === "Enter") analyze();
 });
 
-// AI button is placeholder for next step (Cloudflare Worker)
-elAi.addEventListener("click", () => {
-  alert("AI 解释模块下一步上线：将通过 Cloudflare Worker /api/explain 提供服务端密钥保护。");
+// AI button is placeholder for next step 
+elAi.addEventListener("click", async () => {
+  const smiles = elSmiles.value.trim();
+  if (!smiles) return alert("请先输入 SMILES");
+
+  const apiKey = (elKey.value || "").trim();
+  if (!apiKey) return alert("请先输入 OpenAI API Key（仅本地使用）");
+
+  let props = {};
+  try {
+    props = calcBasicProps(smiles);
+  } catch (e) {
+    props = { note: "props calc failed" };
+  }
+
+  const propsLines = Object.entries(props).map(([k, v]) => `- ${k}: ${v}`).join("\n");
+  const prompt = `
+你是一位严谨但通俗的化学讲解者。请基于以下信息做解释：
+SMILES: ${smiles}
+
+Predicted properties:
+${propsLines}
+
+请输出（中文）：
+1) 这组性质大致意味着什么（极性/疏水性、可能溶解性趋势等）
+2) 结构层面可能的官能团/特点（可推断就说，别胡编）
+3) 可能的用途方向（用“可能/倾向”措辞，不要当成事实）
+4) 一句安全提示：不要据此进行任何危险实验或合成
+
+长度：200~320 字。
+`.trim();
+
+  elAiOut.textContent = "生成中…";
+
+  try {
+    const r = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        input: prompt
+      })
+    });
+
+    const data = await r.json();
+
+    if (!r.ok) {
+      elAiOut.textContent = `OpenAI 请求失败：${r.status}\n${JSON.stringify(data, null, 2)}`;
+      return;
+    }
+
+    elAiOut.textContent = (data.output_text || "").trim() || "(empty)";
+  } catch (e) {
+    elAiOut.textContent = "网络或调用错误：" + String(e.message || e);
+  }
 });
