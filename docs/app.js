@@ -42,6 +42,14 @@ function escapeHtml(s) {
   }[c]));
 }
 
+if (typeof SmilesDrawer === "undefined") {
+  console.error("SmilesDrawer not loaded");
+}
+if (typeof OCL === "undefined") {
+  console.error("OpenChemLib (OCL) not loaded");
+}
+
+
 function drawSmiles(smiles) {
   elSvg.innerHTML = ""; // clear
   const drawer = new SmilesDrawer.SvgDrawer({ width: 420, height: 420, bondThickness: 1.1 });
