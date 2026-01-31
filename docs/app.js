@@ -14,6 +14,18 @@ const elMusicStop = $("musicStop");
 const elMusicRegen = $("musicRegen");
 const elThemeId = $("themeId");
 
+function on(el, evt, fn) {
+  if (!el) return false;
+  el.addEventListener(evt, fn);
+  return true;
+}
+
+function setStatus(msg) {
+  // 复用 aiOut 作为状态输出（没有也不报错）
+  if (typeof elAiOut !== "undefined" && elAiOut) elAiOut.textContent = msg;
+  else console.log(msg);
+}
+
 function setProps(obj) {
   elProps.innerHTML = "";
   for (const [k, v] of Object.entries(obj)) {
@@ -93,18 +105,15 @@ function analyze() {
   }
 }
 
-elAnalyze.addEventListener("click", analyze);
-
-elDemo.addEventListener("click", () => {
-  // Aspirin
+on(elAnalyze, "click", analyze);
+on(elDemo, "click", () => {
   elSmiles.value = "CC(=O)OC1=CC=CC=C1C(=O)O";
   analyze();
 });
-
-// Enter to analyze
-elSmiles.addEventListener("keydown", (e) => {
+on(elSmiles, "keydown", (e) => {
   if (e.key === "Enter") analyze();
 });
+
 
 // AI button is placeholder for next step 
 elAi.addEventListener("click", async () => {
@@ -344,17 +353,28 @@ if (elMusicPlay && elMusicStop && elMusicRegen) {
 
   elMusicStop.addEventListener("click", () => stopMusic());
 
-  elMusicRegen.addEventListener("click", () => {
-    // “重新生成”：在稳定 seed 上加一点扰动（仍可追溯）
+on(elMusicPlay, "click", () => {
+  try {
+    const theme = currentTheme || refreshTheme();
+    if (!theme) return;
+    playTheme(theme);
+  } catch (e) {
+    setStatus("🎵 播放失败：" + String(e.message || e));
+  }
+});
+
+on(elMusicStop, "click", () => stopMusic());
+
+on(elMusicRegen, "click", () => {
+  try {
     const smiles = elSmiles.value.trim();
     if (!smiles) return alert("请先输入 SMILES");
     const salt = Date.now().toString();
-    // 临时：通过追加盐重新生成一次
     const tmp = makeTheme(smiles + "|" + salt);
     currentTheme = tmp;
     if (elThemeId) elThemeId.textContent = tmp.themeId + "*";
     playTheme(tmp);
-  });
-}
-
-
+  } catch (e) {
+    setStatus("🎵 重新生成失败：" + String(e.message || e));
+  }
+});
